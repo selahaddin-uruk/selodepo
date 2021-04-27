@@ -1,1 +1,385 @@
 
+* .swp
+* .pyc
+py / hs /
+hs /
+* .bak
+.idea /
+cracked.txt
+BELİRGİN
+dist /
+inşa /
+files.txt
+
+
+
+DAN 2.7.14-Jessie: piton
+
+ENV DEBIAN_FRONTEND etkileşimsiz
+ENV HASHCAT_VERSION hashcat-3.6.0
+
+# Yükleme gereksinimleri
+ÇALIŞTIR echo "deb-src http://deb.debian.org/debian jessie main" >> /etc/apt/sources.list
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install ca-sertifikaları gcc openssl kmod yapmak nano wget p7zip build-essential libsqlite3-dev libpcap0.8-dev libpcap-dev sqlite3 pkg-config libnl-genl-3-dev libssl-dev net-tools iw ethtool usbutils pciutils kablosuz araçlar git curl wget unzip macchanger pyrit tshark -y
+ÇALIŞTIR apt-get build-dep aircrack-ng -y
+
+
+
+# Aircrack'i Kaynaktan Yükleyin
+ÇALIŞTIR wget http://download.aircrack-ng.org/aircrack-ng-1.2-rc4.tar.gz
+ÇALIŞTIR tar xzvf aircrack-ng-1.2-rc4.tar.gz
+WORKDIR /aircrack-ng-1.2-rc4/
+RUN yapmak
+RUN make install
+RUN airodump-ng-oui-update
+
+# Workdir /
+WORKDIR /
+
+# Wps-pixie'yi yükleyin
+ÇALIŞTIR git klon https://github.com/wiire/pixiewps
+WORKDIR / pixiewps /
+RUN yapmak
+RUN make install
+
+
+# Workdir /
+WORKDIR /
+
+
+# Zorba yükle
+ÇALIŞTIR git klon https://github.com/aanarchyy/bully
+WORKDIR / bully / src /
+RUN yapmak
+RUN make install
+
+
+
+# Workdir /
+WORKDIR /
+
+# Hashcat'i kurun ve yapılandırın
+ÇALIŞTIR mkdir hashcat && \
+    cd hashcat && \
+    wget https://hashcat.net/files_legacy/${HASHCAT_VERSION}.7z && \
+    7zr e $ {HASHCAT_VERSION} .7z
+
+
+# İkili program için bağlantı ekle
+ÇALIŞTIR ln -s /hashcat/hashcat-cli64.bin / usr / bin / hashcat
+
+
+# Reaver'ı yükle
+ÇALIŞTIR git klon https://github.com/gabrielrcouto/reaver-wps.git
+WORKDIR / reaver-wps / src /
+RUN ./configure
+RUN yapmak
+RUN make install
+
+# Workdir /
+WORKDIR /
+
+# Cowpatty yükleyin
+ÇALIŞTIR git klon https://github.com/roobixx/cowpatty.git
+WORKDIR / cowpatty /
+RUN yapmak
+
+# Workdir /
+WORKDIR /
+
+# Wifite'ı yükle
+ÇALIŞTIR git klon https://github.com/derv82/wifite2.git
+WORKDIR / wifite2 /
+GİRİŞ NOKTASI [ "/ bin / bash" ]
+
+
+
+
+Kötü ikiz
+Fluxion , bu saldırının popüler bir örneğidir.
+
+Saldırı için birden fazla kablosuz kart gerekiyor:
+
+İkizi barındırır.
+İstemcilerin kimlik doğrulamasını kaldırır.
+Müşteriler Evil Twin'e bağlandıkça, sahte bir yönlendirici giriş sayfasına yönlendiriliyorlar.
+
+İstemciler, hedef AP'ye parolayı girer. Kötü İkiz o zaman:
+
+Wifi şifresini yakalar,
+Wifi şifresini hedef AP'ye göre doğrular,
+Geçerliyse, tüm istemcilerin Evil Twin'den yetkileri kaldırılır, böylece hedef AP'ye yeniden katılırlar.
+Aksi takdirde, kullanıcıya parolanın geçersiz olduğunu söyleyin ve "tekrar deneyin". 1. adıma gidin.
+Wifite'ın bu özellik için ihtiyaç duyacağı tüm gereksinimler / bileşenler aşağıdadır.
+
+DHCP
+İstemcilere bağlanırken (DHCP aracılığıyla?) IP adreslerini otomatik olarak atamamız gerekir.
+
+DNS Yönlendirmeleri
+Tüm DNS isteklerinin web sunucusuna yeniden yönlendirilmesi gerekir:
+
+Bu yüzden biz müşterilerimiz giriş yapmaya teşvik ediliyoruz.
+Böylece Apple / Google tarafından yapılan sağlık kontrollerine müdahale edebiliriz
+Rogue AP, Sunucu IP Adresi vb.
+Muhtemelen bunu Linux'ta yapmanın birkaç yolu; en güvenilir ve desteklenen yöntemi kullanmalıdır.
+
+Esas olarak şunlara ihtiyacımız var:
+
+Web sunucusunu bir bağlantı noktasında (8000) çalıştırın
+Rogue AP'yi başlatın
+Bazı alt ağ IP'lerine (192.168.1.254) 8000 numaralı bağlantı noktasında localhost atayın
+Tüm ana bilgisayar adlarını 192.168.1.254'e DNS yeniden yönlendirmeye başlayın.
+Gelen istemcilere IP'leri otomatik olarak atamak için DHCP'yi başlatın.
+Gerçek AP'nin istemcilerini kaldırmaya başlayın.
+Sanırım 3-5. Adımlar belirli bir kablosuz karta (arayüz) uygulanabilir.
+
+YAPILACAKLAR: Sahte AP'nin nasıl başlatılacağı, IP atama, DHCP, DNS vb. Hakkında daha fazla ayrıntı.
+Fluxion kullanarak hostapd: kod
+Kali "Evil Wireless AP" (kullanır hostapd): makale
+Fluxion kullanarak airbase-ng: kod
+TODO: Evil Twin, gerçek AP'nin donanım MAC adresini yanıltmalı mı?
+Evet, Fluxion'un yaptığı gibi görünüyor ( kod ).
+ROGUE AP
+Bu bilgiyi şuradan topladı:
+
+PSAttack tarafından " Kali'de kablosuz erişim noktası kurma"
+OffensiveSecurity'den "Kali Linux Evil Kablosuz Erişim Noktası"
+"SniffAir" hostapd komut dosyası
+HOSTAPD
+Erişim noktasını başlatır.
+Varsayılan olarak Kali'ye dahil değildir.
+İle yüklenebilir apt-get install hostapd.
+Dokümanlar
+Yapılandırma dosyası biçimi (örn. ~/hostapd.conf):
+
+driver=nl80211   # 'nl80211' appears in all hostapd tutorials I've found.
+ssid=$EVIL_SSID  # SSID/name of Evil Twin (should match target's)
+hw_mode=$BAND    # Wifi Band, e.g. "g" or "g+n"
+channel=$CHANNEL # Numeric, e.g. "6'
+Çalıştırmak:
+
+hostapd ~/hostapd.conf -i wlan0
+DNSMASQ
+Kali'ye dahildir.
+İle kurulabilir apt-get install dnsmasq
+DNS ve DHCP'yi yönetir.
+Kurulum ve Genel Bakış , Manpage
+Yapılandırma dosyası biçimi (örn. ~/dnsmasq.conf):
+
+interface=wlan0
+dhcp-range=10.0.0.10,10.0.0.250,12h
+dhcp-option=3,10.0.0.1
+dhcp-option=6,10.0.0.1
+#no-resolv
+server=8.8.8.8
+log-queries
+log-dhcp
+
+# Redirect all requests (# is wildcard) to IP of evil web server:
+# TODO: We should rely on iptables, right? Otherwise this redirects traffic from all ports...
+#address=/#/192.168.1.254
+"DNS Girişleri" dosya biçimi ( ~/dns_entries):
+
+[DNS Name] [IP Address]
+# TODO: Are wildcards are supported?
+* 192.168.1.254 # IP of web server
+Çalıştırmak:
+
+dnsmasq -C ~/dnsmasq.conf -H ~/dns_entries
+IPTABLES
+Raspberrypi.org'daki bu başlıktan
+
+80 numaralı bağlantı noktasına yönlendirilen tüm trafiği Pi üzerindeki http sunucusuna yeniden yönlendirmek için iptables kullanın sudo iptables -t nat -A PREROUTING -d 0/0 -p tcp –dport 80 -j DNAT –to 192.168.1.254:80
+
+Ve UnixExchange'de Andreas Wiese'den
+
+Bunu, tüm trafiği AP adresinizin 80 ve 443 numaralı bağlantı noktalarına yönlendiren küçük bir iptables kuralı kümesiyle elde edebilirsiniz: # iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination localhost:80 # iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination localhost:80
+
+YAPMAK:
+
+Peki ya HTTPS trafiği (bağlantı noktası 443)?
+Tarayıcı uyarılarından kaçınmak istiyoruz (Chrome ve Firefox'ta korkutucu).
+Geçersiz sertifika sorununu tetiklemeden 80 numaralı bağlantı noktasına bir 302 yönlendirmesi gönderebileceğimizi düşünmeyin.
+sslstrip bunun üstesinden gelebilir ...
+GÖREVLENDİRME
+Evil Twin + Web Sunucusunu barındırırken, Evil Twin'e katılmaları için müşterilerin hedef AP'deki kimlik doğrulamasını kaldırmamız gerekiyor.
+
+Dinleme
+Daha fazla müşteriyi dinlememiz ve göründükleri anda yeni müşterileri otomatik olarak kaldırmaya başlamalıyız.
+
+Bu, mevcut araçlar tarafından desteklenebilir ...
+
+MDK
+Deauthing & DoS, MDK veya aireplay-ng.
+
+MDK'nın bu iş için daha iyi bir araç olduğunu düşünüyorum, ancak Wifite zaten aircrackpaketi gerektiriyor , bu yüzden ikisini de desteklemeliyiz.
+
+TODO: aireplay-ng TODO'nun mil ilerisindeyse MDK'yı zorunlu kılın : Kalıcı yetkilendirmeler için MDK komutlarını bulun; istemci MAC adreslerinin ve BSSID'lerin bir listesini sağlayabilirsek.
+
+İnternet sitesi
+Yönlendirici Oturum Açma Sayfaları
+Bunlar her satıcı için farklıdır.
+
+Fluxion, birçok popüler yönlendirici satıcısı ( FluxionNetwork / site ) için sahte oturum açma sayfalarına sahip bir depoya sahiptir . Bu depo, çeşitli dillerdeki siteleri içerir.
+
+Popüler satıcılar için yalnızca temel yönlendirici sayfası HTML'ye (Başlık / logo) ve CSS'ye (renkler / yazı tipi) ihtiyacımız var.
+
+Bir satıcıya ait sayfamızın olmaması durumunda da "genel" bir giriş sayfasına ihtiyacımız var.
+
+Satıcının kullandığı HTML, resimler, yazı tipleri ve CSS'yi barındırmak için web sunucusu.
+Parolayı web sunucusuna göndermek için Javascript
+Dil desteği
+Not: Kullanıcılar, barındırılacak dili seçmelidir; herhangi bir komut dosyası algılamasından daha iyi bilirler.
+
+Her yönlendirici sayfasında, istemciye Wifi şifresini girmesi gerektiğini bildiren bir uyarı mesajı olacaktır:
+
+"Yönlendirici aygıt yazılımı güncellemesinden sonra şifre gerekir"
+Giriş sayfası içeriği (HTML / resimler / css) yalnızca logo ve uyarı mesajına indirgenebilir. Başka hiçbir şeye navigasyon çubuğu / kenar çubuğu / bağlantı yok.
+
+O zaman yalnızca uyarı mesajının dile göre şablonlanması gerekir (her dil için yalnızca bir cümleye ihtiyacımız var).
+
+Bu, her Satıcı ve dil için ayrı "siteler" ihtiyacını ortadan kaldırır .
+
+Ancak muhtemelen çevrilecek başka etiketlere de ihtiyacımız var:
+
+Sayfanın başlığı ("Yönlendirici Giriş Sayfası")
+"Parola:"
+"Şifreyi yeniden gir:"
+"Yeniden Bağlan" veya "Giriş Yap"
+... Yani dil başına 5 cümle. Fena değil.
+
+Web sunucusu, dil değişkeni değerlerini içeren bir Javascript dosyası gönderebilir:
+
+belge . title  =  'Yönlendirici Girişi' ; 
+belge . querySelector ( '#warn' ) . textContent ( 'Yönlendirici aygıt yazılımı yükseltmesinden sonra oturum açmanız gerekir.' ) ; 
+belge . querySelector ( '#pass' ) . textContent ( 'Parola:' ) ; 
+// ...
+Bir HTML Dosyası
+Her şeyi tek bir HTML dosyasında sıkıştırabiliriz:
+
+Satır içi CSS
+Satır içi resimler (base64 image / jpg)
+Uyarı mesajı, şifre etiketi, oturum açma düğmesi için bazı yer tutucular.
+Bu, "çok sayıda klasör" sorununu ortadan kaldıracaktır; tüm .html dosyaları için bir klasör.
+
+Örneğin ASUS.html, hedef MAC satıcısı içerdiğinde seçilebilir ASUS.
+
+AJAX Şifre Gönderimi
+Web sitesinin parolayı web sunucusuna muhtemelen bazı uç noktalar aracılığıyla göndermesi gerekir (örn. ./login.cgi?password1=...&password2=...).
+
+Javascript'te yapmak kolay (basit <form>veya çift yoluyla XMLHttpRequest).
+
+Web sunucusu
+Web sunucusu tarafından sunulan web siteleri dinamiktir ve çok sayıda değişkene bağlıdır.
+
+Bazı mantığı izlemeyi kolaylaştıracak CGIHTTPServer'ı Python'da kullanmak istiyoruz.
+
+Adres Sahteciliği Durum Denetimleri
+Bazı cihazlar (Android, iOS, Windows?), Harici olarak barındırılan bir web sayfası isteyerek AP'nin internet bağlantısı olduğunu doğrular.
+
+Müşterinin cihazının Evil Twin'i "çevrimiçi" olarak göstermesi için bu web sayfalarını tam olarak aldatmak istiyoruz .
+
+Fluxion bunu burada yapar ( "Bağlantı Yanıtları" olarak adlandırılır ).
+
+Özellikle de lighttpd.confburada .
+
+Gereksinimler:
+
+Web sunucusu, bu durum denetimi sayfalarına gelen istekleri algılar ve beklenen yanıtı (HTML, 204, vb.) Döndürür.
+YAPILACAKLAR: Apple ve Google cihazları için ana bilgisayar adlarını / yollarını ve beklenen yanıtları öğrenmek için Fluxion'a gidin.
+
+HTTPS
+Ya Google, Apple HTTPS gerektiriyorsa? Sertifikaları bir şekilde taklit edebilir miyiz? Veya HTTP'ye yönlendirmek mi?
+
+Sahte Yönlendirici Oturum Açma Sayfaları
+Yönlendirici satıcısını MAC adresine göre tespit edebiliriz.
+
+O satıcı için sahte bir giriş sayfamız varsa, bunu sunuyoruz.
+
+Aksi takdirde genel bir giriş sayfası sunarız.
+
+TODO: Satıcıyı tespit etmek için macchanger'ı kullanabilir miyiz veya bazı eşlemeler alabilir BSSID_REGEX -> HTML_FILEmiyiz?
+
+Şifre Yakalama
+Web sunucusunun bir istemcinin ne zaman bir parola girdiğini bilmesi gerekir.
+
+Bu, basit bir CGI uç noktası veya Python betiği aracılığıyla gerçekleştirilebilir.
+
+Örneğin login.cgiokur password1ve password2sorgu dizesinden.
+
+Parola Doğrulama
+Web sunucusunun parolanın ne zaman geçerli olduğunu bilmesi gerekir.
+
+Bu, kullanılmayan bir kablosuz kart üzerindeki hedef AP'ye bağlanmayı gerektirir:
+
+İlk kart web sunucusunu barındırıyor. Bunun düşmesi garip olurdu.
+İkinci kart Deauthing istemcileridir. Bu, parola doğrulanırken 'duraklatılabilir', ancak bu, istemcilerin hedef AP'ye bağlanmasına izin verebilir.
+... Üçüncü bir wifi kartı bunu daha temiz hale getirebilir.
+TODO: Linux'ta Wifi şifrelerini doğrulamak için tam komutlar; Sanırım kullanmalıyız wpa_supplicantve benzerleri. YAPILACAKLAR: Wifi şifrelerini doğrulamak için en hızlı ve en çok yeniden yüklenebilir yöntemi seçin
+
+Evil Webserver & Deauth İletişimi
+Evil Twin'i barındıran erişim noktasının Deauth mekanizmasıyla iletişim kurması gerekir:
+
+Hangi BSSID'lerin Evil Twin'i işaret edeceği,
+Hangi BSSID'lerin gerçek AP'yi göstereceği.
+Web sunucusunun saldırının tamamı boyunca çalışması gerektiğinden, saldırının durumunu web sunucusu içinde kontrol edebiliriz.
+
+Bu nedenle web sunucusunun şunları sağlaması gerekir:
+
+Gerçek AP'den kaldırılacak BSSID'lerin listesi (böylece Evil Twin'e katılırlar),
+Evil Twin'den kaldırılacak BSSID'lerin listesi (böylece gerçek AP'ye katılırlar),
+Yukarıdaki BSSID'leri ayrı bir kablosuz kartta deşifre eden arka plan işlemi.
+Bunun Python'da ne kadar mümkün olduğundan emin değilim; ayrıca sahneyi depolamak için statik dosyaları kullanmaya da başvurabiliriz (örn. BSSID'lerle JSON dosyası ve mevcut adım - örn. "Kapatma" veya "Şifre için Waiing").
+
+TODO: CGIHTTPServer'ın arka plan iş parçacıklarını koruyabileceğimiz / değiştirebileceğimiz bir yolu olup olmadığına bakın. TODO: CGIHTTPServer'da durumu korumanın ne kadar zor olduğunu görün (dosya sistemini kullanmak zorunda mıyız?)
+
+Başarı ve Temizleme
+Şifre bulunduğunda, AJAX isteğine bir "başarılı" mesajı göndermek istiyoruz, böylece kullanıcı anında geri bildirim alır (ve belki bir "Yeniden bağlanılıyor ..." mesajı).
+
+Kapatma sırasında, Evil Twin'deki tüm istemcileri gerçek AP'ye yeniden katılmaları için kaldırmalıyız.
+
+Bu iptal, tüm müşterilerin Evil Twin'den kimlik doğrulaması kaldırılıncaya kadar devam etmelidir.
+
+Ardından komut dosyası durdurulabilir.
+
+Kavramın ispatı
+AP'yi başlatın ve tüm port-80 trafiğini yakalayın:
+
+ifconfig wlan0 10.0.0.1/24 up
+
+# start dnsmasq for dhcp & dns resolution (runs in background)
+killall dnsmasq
+dnsmasq -C dnsmasq.conf
+
+# reroute all port-80 traffic to our machine
+iptables -N internet -t mangle
+iptables -t mangle -A PREROUTING -j internet
+iptables -t mangle -A internet -j MARK --set-mark 99
+iptables -t nat -A PREROUTING -m mark --mark 99 -p tcp --dport 80 -j DNAT --to-destination 10.0.0.1
+echo "1" > /proc/sys/net/ipv4/ip_forward
+iptables -A FORWARD -i eth0 -o wlan0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -m mark --mark 99 -j REJECT
+iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# start wifi access point (new terminal)
+killall hostapd
+hostapd ./hostapd.conf -i wlan0
+
+# start webserver on port 80 (new terminal)
+python -m SimpleHTTPServer 80
+Temizlemek:
+
+# stop processes
+# ctrl+c hostapd
+# ctrl+c python simple http server
+killall dnsmasq
+
+# reset iptables
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
